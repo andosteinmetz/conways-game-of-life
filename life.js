@@ -2,6 +2,23 @@
  * An implementation of John Conway's game of life
  */
 
+// take x steps
+function iterate(count, timeout, grid){
+	if (typeof grid === 'undefined') { 
+		grid = randomGrid(24, 24); 
+	}
+	if(count > 0){
+		grid = step(grid);
+		console.log(grid);
+		setTimeout( () =>{
+			iterate(count - 1, width, height, timeout, grid);
+		}, timeout);
+	}
+	else{
+		console.log('done!');
+		return;
+	}
+}
 
 // an iteration of the algorithm
 function step(grid){
@@ -9,7 +26,7 @@ function step(grid){
 }
 
 // build an empty grid
-function buildGrid(width, height){
+function randomGrid(width, height){
 	const grid = [];
 	for(let i = 0; i < height; i ++){
 		let row = [];
@@ -64,9 +81,9 @@ function toggleCell(){
 	cell = !cell
 }
 
-exports.buildGrid = buildGrid;
+exports.randomGrid = randomGrid;
 exports.step = step;
-
+exports.iterate = iterate;
 
 
 
