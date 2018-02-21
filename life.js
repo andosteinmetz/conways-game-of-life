@@ -2,6 +2,20 @@
  * An implementation of John Conway's game of life
  */
 
+ /**
+  * TODO:
+  * 
+  * - Decouple DOM writes from the game logic
+  * - Improve performance! Rewriting the entire DOM every generation makes the fans spin at 60fps.
+  * A reactive DOM would solve both of these problems
+  * https://www.monterail.com/blog/2016/how-to-build-a-reactive-engine-in-javascript-part-1-observable-objects
+  *
+  * - Make the "world" "round" i.e. connect the first and last columns and rows. 
+  *   Notice how a glider crystalizes into a static square at the edge of the grid.
+  *
+  * - Halt if stasis is reached?
+  */
+
 // take x steps
 function iterate(count, timeout, grid){
 	if (typeof grid === 'undefined') { 
@@ -115,7 +129,7 @@ function update(grid){
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-	iterate(100, 100);	
+	iterate(1000, 100);	
 })();
 
 // exports.randomGrid = randomGrid;
