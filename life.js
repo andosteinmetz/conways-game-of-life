@@ -10,8 +10,9 @@ function iterate(count, timeout, grid){
 	if(count > 0){
 		grid = step(grid);
 		console.log(grid);
+		update(grid);
 		setTimeout( () =>{
-			iterate(count - 1, width, height, timeout, grid);
+			iterate(count - 1, timeout, grid);
 		}, timeout);
 	}
 	else{
@@ -81,9 +82,45 @@ function toggleCell(){
 	cell = !cell
 }
 
-exports.randomGrid = randomGrid;
-exports.step = step;
-exports.iterate = iterate;
+function update(grid){
+	const app = document.getElementById('app');
+
+	const rows = [];
+
+	for(let i = 0; i < grid.length; i++){
+		let row = document.createElement('div');
+		row.classList.add('row');
+
+		let cells = grid[i].map((cell) => {
+			const el = document.createElement('span');
+			el.classList.add('cell');
+			if(cell > 0){
+				el.classList.add('live')
+			}
+			return el;
+		});
+
+		for(let j = 0; j < cells.length; j++){
+			row.appendChild(cells[j]);
+		}
+
+		rows.push(row);
+	}
+
+	app.innerHTML = '';
+
+	for(i = 0; i < rows.length; i++){
+		app.appendChild(rows[i]);
+	}
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+	iterate(100, 100);	
+})();
+
+// exports.randomGrid = randomGrid;
+// exports.step = step;
+// exports.iterate = iterate;
 
 
 
