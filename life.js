@@ -10,7 +10,7 @@
   * A reactive DOM would solve both of these problems
   * https://www.monterail.com/blog/2016/how-to-build-a-reactive-engine-in-javascript-part-1-observable-objects
   *
-  * - Make the "world" "round" i.e. connect the first and last columns and rows. 
+  * x Make the "world" "round" i.e. connect the first and last columns and rows. 
   *   Notice how a glider crystalizes into a static square at the edge of the grid.
   *
   * - Halt if stasis is reached?
@@ -60,12 +60,22 @@ function findByCoordinates(x, y, grid){
 }
 
 // create an array of the values of all neighboring cells in the 9-square surrounding the cell at x, y
-// taking a short-cut by masking out all but the adjacent cells
 function getNeighbors(x, y, grid){
-	
-	const prevRowNeighbors = y - 1 >= 0 ? grid[y - 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
-	const sameRowNeighbors = grid[y].map((val, index) => index === x + 1 || index === x - 1 ? val : 0); // exclude self
-	const nextRowNeighbors = y + 1 < grid.length ? grid[y + 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
+
+	const prevRow = mod(y - 1, grid.length);
+	const nextRow = mod(y + 1, grid.length);
+
+	const prevCol = mod(x - 1, grid[y].length);
+	const nextCol = mod(x + 1, grid[y].length);
+
+	const prevRowNeighbors = [ grid[prevRow][prevCol], grid[prevRow][x], grid[prevRow][nextCol] ];
+	const sameRowNeighbors = [ grid[y][prevCol], grid[y][nextCol] ];
+	const nextRowNeighbors = [ grid[nextRow][prevCol], grid[nextRow][x], grid[nextRow][nextCol] ];
+
+	// taking a short-cut by masking out all but the adjacent cells
+	// const prevRowNeighbors = y - 1 >= 0 ? grid[y - 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
+	// const sameRowNeighbors = grid[y].map((val, index) => index === x + 1 || index === x - 1 ? val : 0); // exclude self
+	// const nextRowNeighbors = y + 1 < grid.length ? grid[y + 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
 
 	return [].concat(prevRowNeighbors).concat(sameRowNeighbors).concat(nextRowNeighbors);
 }
@@ -74,6 +84,12 @@ function getNeighbors(x, y, grid){
 function sum(a, b){
 	return parseInt(a) + parseInt(b);
 }
+
+// a modulo that works for both addition and subtraction
+function mod(x, m){
+	return ((x % m) + m) % m;
+}
+
 
 // sum the values of neighboring cells
 function evalNeighbors(x, y, grid){
