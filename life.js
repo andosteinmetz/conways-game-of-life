@@ -16,17 +16,26 @@
   * - Halt if stasis is reached?
   */
 
+var DOMrows;
+
+const glider = [
+	[0, 1, 0],
+	[0, 0, 1],
+	[1, 1, 1]
+];
+
 // take x steps
-function iterate(count, timeout, grid){
+function iterate(count, timeout, grid, callback){
 	if (typeof grid === 'undefined') { 
-		grid = randomGrid(24, 24); 
+		const grid = randomGrid(24, 24); 
 	}
 	if(count > 0){
 		grid = step(grid);
-		console.log(grid);
-		update(grid);
+		if (typeof callback === 'function') {
+			callback(grid);
+		}
 		setTimeout( () =>{
-			iterate(count - 1, timeout, grid);
+			iterate(count - 1, timeout, grid, callback);
 		}, timeout);
 	}
 	else{
@@ -72,11 +81,6 @@ function getNeighbors(x, y, grid){
 	const sameRowNeighbors = [ grid[y][prevCol], grid[y][nextCol] ];
 	const nextRowNeighbors = [ grid[nextRow][prevCol], grid[nextRow][x], grid[nextRow][nextCol] ];
 
-	// taking a short-cut by masking out all but the adjacent cells
-	// const prevRowNeighbors = y - 1 >= 0 ? grid[y - 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
-	// const sameRowNeighbors = grid[y].map((val, index) => index === x + 1 || index === x - 1 ? val : 0); // exclude self
-	// const nextRowNeighbors = y + 1 < grid.length ? grid[y + 1].map((val, index) => index >= x - 1 && index <= x + 1 ? val : 0) : [];
-
 	return [].concat(prevRowNeighbors).concat(sameRowNeighbors).concat(nextRowNeighbors);
 }
 
@@ -112,10 +116,11 @@ function toggleCell(){
 	cell = !cell
 }
 
-function update(grid){
-	const app = document.getElementById('app');
 
-	const rows = [];
+
+function buildDOM(grid){
+
+	const DOMrows = [];
 
 	for(let i = 0; i < grid.length; i++){
 		let row = document.createElement('div');
@@ -124,9 +129,6 @@ function update(grid){
 		let cells = grid[i].map((cell) => {
 			const el = document.createElement('span');
 			el.classList.add('cell');
-			if(cell > 0){
-				el.classList.add('live')
-			}
 			return el;
 		});
 
@@ -134,18 +136,41 @@ function update(grid){
 			row.appendChild(cells[j]);
 		}
 
-		rows.push(row);
+		DOMrows.push(row);
 	}
 
-	app.innerHTML = '';
+	return DOMrows;
+}
 
-	for(i = 0; i < rows.length; i++){
-		app.appendChild(rows[i]);
+function appendGrid(DOMrows){
+	const app = document.getElementById('app');
+	for(i = 0; i < DOMrows.length; i++){
+		app.appendChild(DOMrows[i]);
+	}
+}
+
+function updateDOM(grid){
+	for (let i = 0; i < grid.length; i++){
+		let row = grid[i];
+		let DOMrow = DOMrows[i];
+		for( let j = 0; j < row.length; j++ ){
+			let cell = row[j];
+			let DOMcell = DOMrow.getElementsByClassName('cell')[j];
+			if( cell === 0 && DOMcell.classList.contains('live')){
+				DOMcell.classList.remove('live');
+			}
+			else if (cell === 1 && !DOMcell.classList.contains('live')){
+				DOMcell.classList.add('live');
+			}
+		}
 	}
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-	iterate(1000, 100);	
+	const grid = randomGrid(24, 24);
+	DOMrows = buildDOM(grid);
+	appendGrid(DOMrows);
+	iterate(1000, 100, grid, updateDOM);	
 })();
 
 // exports.randomGrid = randomGrid;
