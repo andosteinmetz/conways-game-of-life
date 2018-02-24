@@ -5,7 +5,7 @@
  /**
   * TODO:
   * 
-  * - Decouple DOM writes from the game logic
+  * x Decouple DOM writes from the game logic
   * - Improve performance! Rewriting the entire DOM every generation makes the fans spin at 60fps.
   * A reactive DOM would solve both of these problems
   * https://www.monterail.com/blog/2016/how-to-build-a-reactive-engine-in-javascript-part-1-observable-objects
@@ -16,13 +16,18 @@
   * - Halt if stasis is reached?
   */
 
-var DOMrows;
-
 const glider = [
 	[0, 1, 0],
 	[0, 0, 1],
 	[1, 1, 1]
 ];
+
+
+/* - - - - - - - 
+ *
+ * Game logic
+ *
+ */
 
 // take x steps
 function iterate(count, timeout, grid, callback){
@@ -30,12 +35,12 @@ function iterate(count, timeout, grid, callback){
 		const grid = randomGrid(24, 24); 
 	}
 	if(count > 0){
-		grid = step(grid);
+		const newGrid = step(grid);
 		if (typeof callback === 'function') {
-			callback(grid);
+			callback(newGrid);
 		}
 		setTimeout( () =>{
-			iterate(count - 1, timeout, grid, callback);
+			iterate(count - 1, timeout, newGrid, callback);
 		}, timeout);
 	}
 	else{
@@ -81,7 +86,7 @@ function getNeighbors(x, y, grid){
 	const sameRowNeighbors = [ grid[y][prevCol], grid[y][nextCol] ];
 	const nextRowNeighbors = [ grid[nextRow][prevCol], grid[nextRow][x], grid[nextRow][nextCol] ];
 
-	return [].concat(prevRowNeighbors).concat(sameRowNeighbors).concat(nextRowNeighbors);
+	return prevRowNeighbors.concat(sameRowNeighbors).concat(nextRowNeighbors);
 }
 
 // obvious
@@ -116,15 +121,19 @@ function toggleCell(){
 	cell = !cell
 }
 
+/* - - - - - - - - - -
+ *
+ *   DOM manipulation
+ *
+ */
 
+var DOMCells; // keep a reference of the cell elements
 
-function buildDOM(grid){
-
-	const DOMrows = [];
+function createDOMCells(grid){
+	const rows = [];
 
 	for(let i = 0; i < grid.length; i++){
-		let row = document.createElement('div');
-		row.classList.add('row');
+		let row = []
 
 		let cells = grid[i].map((cell) => {
 			const el = document.createElement('span');
@@ -133,29 +142,42 @@ function buildDOM(grid){
 		});
 
 		for(let j = 0; j < cells.length; j++){
-			row.appendChild(cells[j]);
+			row.push(cells[j]);
 		}
 
-		DOMrows.push(row);
+		rows.push(row);
 	}
-
-	return DOMrows;
+	return rows;
 }
 
-function appendGrid(DOMrows){
+function appendGrid(DOMCells){
+	const DOMRows = createDOMRows(DOMCells)
 	const app = document.getElementById('app');
-	for(i = 0; i < DOMrows.length; i++){
-		app.appendChild(DOMrows[i]);
+	for(i = 0; i < DOMRows.length; i++){
+		app.appendChild(DOMRows[i]);
+	}
+
+	function createDOMRows(DOMCells){
+		const rows = DOMCells.map((row, index) => {
+			var el = document.createElement('div');
+			el.classList.add('row')
+			for(i = 0; i < row.length; i++){
+				el.appendChild(row[i]);
+			}
+			return el;
+		});
+	
+		return rows;
 	}
 }
 
 function updateDOM(grid){
 	for (let i = 0; i < grid.length; i++){
 		let row = grid[i];
-		let DOMrow = DOMrows[i];
+		let DOMrow = DOMCells[i];
 		for( let j = 0; j < row.length; j++ ){
 			let cell = row[j];
-			let DOMcell = DOMrow.getElementsByClassName('cell')[j];
+			let DOMcell = DOMrow[j];
 			if( cell === 0 && DOMcell.classList.contains('live')){
 				DOMcell.classList.remove('live');
 			}
@@ -166,10 +188,16 @@ function updateDOM(grid){
 	}
 }
 
+/** - - - - - - - - 
+ *
+ * Run in browser 
+ *
+ */
+
 document.addEventListener('DOMContentLoaded', function(){
 	const grid = randomGrid(24, 24);
-	DOMrows = buildDOM(grid);
-	appendGrid(DOMrows);
+	DOMCells = createDOMCells(grid);
+	appendGrid(DOMCells);
 	iterate(1000, 100, grid, updateDOM);	
 })();
 
