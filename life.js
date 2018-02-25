@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	DOMCells = createDOMCells(grid);
 	appendGrid(DOMCells);
 	iterate(1000, 100, grid, updateDOM);	
-})();
+});
 
 // exports.randomGrid = randomGrid;
 // exports.step = step;
