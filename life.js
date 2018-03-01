@@ -6,14 +6,14 @@
   * TODO:
   * 
   * x Decouple DOM writes from the game logic
-  * - Improve performance! Rewriting the entire DOM every generation makes the fans spin at 60fps.
+  * x Improve performance! Rewriting the entire DOM every generation makes the fans spin at 60fps.
   * A reactive DOM would solve both of these problems
   * https://www.monterail.com/blog/2016/how-to-build-a-reactive-engine-in-javascript-part-1-observable-objects
   *
   * x Make the "world" "round" i.e. connect the first and last columns and rows. 
   *   Notice how a glider crystalizes into a static square at the edge of the grid.
   *
-  * - Halt if stasis is reached?
+  * - Halt if stasis is reached. Find the most performant way to test array equality.
   */
 
 const glider = [
@@ -201,7 +201,6 @@ function drawCell(ctx, x, y, w, h, fill){
 	ctx.fillStyle = fill;
 	ctx.rect(x, y, w, h);
 	ctx.fill();
-	ctx.stroke();
 }
 
 function drawGrid(ctx, grid, cellSize){
@@ -209,12 +208,12 @@ function drawGrid(ctx, grid, cellSize){
 	const height = grid.length * cellSize;
 	const width = grid[0].length * cellSize;
 
-	for(let i = 0; i < grid.length; i++){
+	for(let i = 0; i <= grid.length; i++){
 		let yPos = i * cellSize + 1;
 		drawHorizontal(ctx, yPos, width);
 	}
 
-	for( let j = 0; j < grid[0].length; j++ ){
+	for( let j = 0; j <= grid[0].length; j++ ){
 		let xPos = j * cellSize + 1;
 		drawVertical(ctx, xPos, height);
 	}
@@ -246,9 +245,6 @@ function updateCanvas(grid){
 
 	ctx.clearRect(0, 0, canvasHeight, canvasWidth);
 	drawGrid(ctx, grid, cellWidth);
-
-	ctx.strokeStyle = 'rgb(100, 100, 100)';
-	ctx.lineWidth = .25;
 
 	for( let i = 0; i < grid.length; i++ ){
 		let row = grid[i];
@@ -283,7 +279,7 @@ function updateCanvas(grid){
  function startCanvasGame(){
  	const grid = randomGrid(128, 128);
  	ctx = document.getElementById('canvasApp').getContext('2d');
- 	iterate(1000, 50, grid, updateCanvas);
+ 	iterate(10000, 50, grid, updateCanvas);
  }
 
 document.addEventListener('DOMContentLoaded', function(){
