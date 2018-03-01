@@ -204,13 +204,49 @@ function drawCell(ctx, x, y, w, h, fill){
 	ctx.stroke();
 }
 
+function drawGrid(ctx, grid, cellSize){
+
+	const height = grid.length * cellSize;
+	const width = grid[0].length * cellSize;
+
+	for(let i = 0; i < grid.length; i++){
+		let yPos = i * cellSize + 1;
+		drawHorizontal(ctx, yPos, width);
+	}
+
+	for( let j = 0; j < grid[0].length; j++ ){
+		let xPos = j * cellSize + 1;
+		drawVertical(ctx, xPos, height);
+	}
+}
+
+function drawLine(ctx, startX, startY, endX, endY){
+	ctx.strokeStyle = 'rgb(100, 100, 100)';
+	ctx.lineWidth = .125;
+	ctx.beginPath();
+	ctx.moveTo(startX, startY);
+	ctx.lineTo(endX, endY);
+	ctx.stroke();
+}
+
+function drawHorizontal(ctx, yPos, length){
+	drawLine(ctx, 0, yPos, length, yPos);
+}
+
+function drawVertical(ctx, xPos, length){
+	drawLine(ctx, xPos, 0, xPos, length);
+}
+
 function updateCanvas(grid){
 	const cellWidth = 8;
 	const cellHeight = 8;
 	const canvasHeight = (cellWidth + 1) * grid.length;
 	const canvasWidth = (cellWidth + 1) * grid[0].length;
 
+
 	ctx.clearRect(0, 0, canvasHeight, canvasWidth);
+	drawGrid(ctx, grid, cellWidth);
+
 	ctx.strokeStyle = 'rgb(100, 100, 100)';
 	ctx.lineWidth = .25;
 
@@ -220,7 +256,9 @@ function updateCanvas(grid){
 			let x = j * cellWidth + 1;
 			let y = i * cellWidth + 1;
 			let fill = row[j] ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)';
-			drawCell(ctx, x, y, cellWidth, cellHeight, fill);
+			if(row[j]){
+				drawCell(ctx, x, y, cellWidth, cellHeight, fill);
+			}
 		}
 	}
 }
@@ -243,7 +281,7 @@ function updateCanvas(grid){
  }
 
  function startCanvasGame(){
- 	const grid = randomGrid(48, 48);
+ 	const grid = randomGrid(128, 128);
  	ctx = document.getElementById('canvasApp').getContext('2d');
  	iterate(1000, 50, grid, updateCanvas);
  }
