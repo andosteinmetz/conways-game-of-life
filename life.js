@@ -188,17 +188,69 @@ function updateDOM(grid){
 	}
 }
 
+/** - - - - - - - - - - - -
+ *
+ * Canvas manipulation
+ *
+ */
+
+ var ctx;
+
+function drawCell(ctx, x, y, w, h, fill){
+	ctx.beginPath();
+	ctx.fillStyle = fill;
+	ctx.rect(x, y, w, h);
+	ctx.fill();
+	ctx.stroke();
+}
+
+function updateCanvas(grid){
+	const cellWidth = 8;
+	const cellHeight = 8;
+	const canvasHeight = (cellWidth + 1) * grid.length;
+	const canvasWidth = (cellWidth + 1) * grid[0].length;
+
+	ctx.clearRect(0, 0, canvasHeight, canvasWidth);
+	ctx.strokeStyle = 'rgb(100, 100, 100)';
+	ctx.lineWidth = .25;
+
+	for( let i = 0; i < grid.length; i++ ){
+		let row = grid[i];
+		for( let j = 0; j < row.length; j++ ){
+			let x = j * cellWidth + 1;
+			let y = i * cellWidth + 1;
+			let fill = row[j] ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)';
+			drawCell(ctx, x, y, cellWidth, cellHeight, fill);
+		}
+	}
+}
+
+
+
+
+
 /** - - - - - - - - 
  *
  * Run in browser 
  *
  */
 
-document.addEventListener('DOMContentLoaded', function(){
-	const grid = randomGrid(24, 24);
+ function startDOMGame(){
+ 	const grid = randomGrid(24, 24);
 	DOMCells = createDOMCells(grid);
 	appendGrid(DOMCells);
 	iterate(1000, 100, grid, updateDOM);	
+ }
+
+ function startCanvasGame(){
+ 	const grid = randomGrid(48, 48);
+ 	ctx = document.getElementById('canvasApp').getContext('2d');
+ 	iterate(1000, 50, grid, updateCanvas);
+ }
+
+document.addEventListener('DOMContentLoaded', function(){
+	// startDOMGame();
+	startCanvasGame();
 });
 
 // exports.randomGrid = randomGrid;
