@@ -31,7 +31,7 @@ const glider = [
  */
 
 const CELL_HEIGHT = 6; //px
-const CELL_WIDTH = 6; //px
+const CELL_WIDTH = 10; //px
 
 const GRID_HEIGHT = 128; // cells
 const GRID_WIDTH = 128; // cells
@@ -223,10 +223,10 @@ function drawCell(ctx, x, y, w, h, fill){
 	ctx.fill();
 }
 
-function drawGrid(ctx, grid, cellSize){
+function drawGrid(ctx, grid, cellHeight, cellWidth){
 
-    const height = grid.length * cellSize + 1;
-    const width = grid[0].length * cellSize + 1;
+    const height = grid.length * cellHeight + 1;
+    const width = grid[0].length * cellWidth + 1;
 
     ctx.beginPath();
     ctx.fillStyle = DEAD_COLOR;
@@ -234,12 +234,12 @@ function drawGrid(ctx, grid, cellSize){
     ctx.fill();
 
 	for(let i = 0; i <= grid.length; i++){
-		let yPos = i * cellSize + 1;
+		let yPos = i * cellHeight + 1;
 		drawHorizontal(ctx, yPos, width);
 	}
 
 	for( let j = 0; j <= grid[0].length; j++ ){
-		let xPos = j * cellSize + 1;
+		let xPos = j * cellWidth + 1;
 		drawVertical(ctx, xPos, height);
 	}
 }
@@ -269,13 +269,13 @@ function updateCanvas(grid){
 
 
 	ctx.clearRect(0, 0, canvasHeight, canvasWidth);
-	drawGrid(ctx, grid, cellWidth);
+	drawGrid(ctx, grid, cellHeight, cellWidth);
 
 	for( let i = 0; i < grid.length; i++ ){
 		let row = grid[i];
 		for( let j = 0; j < row.length; j++ ){
 			let x = j * cellWidth + 1;
-			let y = i * cellWidth + 1;
+			let y = i * cellHeight + 1;
 			let fill = row[j] ? LIVE_COLOR : DEAD_COLOR;
 			if(row[j]){
 				drawCell(ctx, x, y, cellWidth, cellHeight, fill);
