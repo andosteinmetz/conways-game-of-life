@@ -39,6 +39,10 @@ const GRID_WIDTH = 128; // cells
 const TIMEOUT = 50; //ms
 const COUNT = 10000; // iterations before stopping
 
+const LIVE_COLOR = 'rgb(100, 100, 255)';
+const DEAD_COLOR = 'rgb(255, 255, 255)';
+const GRIDLINE_COLOR = 'rgb(100, 100, 100)';
+
 /* - - - - - - - 
  *
  * Game logic
@@ -221,8 +225,13 @@ function drawCell(ctx, x, y, w, h, fill){
 
 function drawGrid(ctx, grid, cellSize){
 
-	const height = grid.length * cellSize;
-	const width = grid[0].length * cellSize;
+    const height = grid.length * cellSize + 1;
+    const width = grid[0].length * cellSize + 1;
+
+    ctx.beginPath();
+    ctx.fillStyle = DEAD_COLOR;
+    ctx.rect(0, 0, width, height);
+    ctx.fill();
 
 	for(let i = 0; i <= grid.length; i++){
 		let yPos = i * cellSize + 1;
@@ -236,7 +245,7 @@ function drawGrid(ctx, grid, cellSize){
 }
 
 function drawLine(ctx, startX, startY, endX, endY){
-	ctx.strokeStyle = 'rgb(100, 100, 100)';
+	ctx.strokeStyle = GRIDLINE_COLOR;
 	ctx.lineWidth = .125;
 	ctx.beginPath();
 	ctx.moveTo(startX, startY);
@@ -267,7 +276,7 @@ function updateCanvas(grid){
 		for( let j = 0; j < row.length; j++ ){
 			let x = j * cellWidth + 1;
 			let y = i * cellWidth + 1;
-			let fill = row[j] ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)';
+			let fill = row[j] ? LIVE_COLOR : DEAD_COLOR;
 			if(row[j]){
 				drawCell(ctx, x, y, cellWidth, cellHeight, fill);
 			}
