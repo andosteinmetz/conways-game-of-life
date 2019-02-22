@@ -13,7 +13,9 @@
   * x Make the "world" "round" i.e. connect the first and last columns and rows. 
   *   Notice how a glider crystalizes into a static square at the edge of the grid.
   *
-  * - Halt if stasis is reached. Find the most performant way to test array equality.
+  * - Halt if stasis is reached? Find the most performant way to test array equality.
+  *
+  * - Create a way to manually toggle a cell on the canvas.
   */
 
 const glider = [
@@ -22,6 +24,20 @@ const glider = [
 	[1, 1, 1]
 ];
 
+/* - - - - - - -
+ *
+ * SETTINGS
+ *
+ */
+
+const CELL_HEIGHT = 6; //px
+const CELL_WIDTH = 6; //px
+
+const GRID_HEIGHT = 128; // cells
+const GRID_WIDTH = 128; // cells
+
+const TIMEOUT = 50; //ms
+const COUNT = 10000; // iterations before stopping
 
 /* - - - - - - - 
  *
@@ -32,7 +48,7 @@ const glider = [
 // take x steps
 function iterate(count, timeout, grid, callback){
 	if (typeof grid === 'undefined') { 
-		const grid = randomGrid(24, 24); 
+		const grid = randomGrid(GRID_HEIGHT, GRID_WIDTH); 
 	}
 	if(count > 0){
 		const newGrid = step(grid);
@@ -123,7 +139,7 @@ function toggleCell(){
 
 /* - - - - - - - - - -
  *
- *   DOM manipulation
+ * DOM manipulation
  *
  */
 
@@ -237,8 +253,8 @@ function drawVertical(ctx, xPos, length){
 }
 
 function updateCanvas(grid){
-	const cellWidth = 8;
-	const cellHeight = 8;
+	const cellWidth = CELL_WIDTH;
+	const cellHeight = CELL_HEIGHT;
 	const canvasHeight = (cellWidth + 1) * grid.length;
 	const canvasWidth = (cellWidth + 1) * grid[0].length;
 
@@ -277,9 +293,9 @@ function updateCanvas(grid){
  }
 
  function startCanvasGame(){
- 	const grid = randomGrid(128, 128);
+ 	const grid = randomGrid(GRID_WIDTH, GRID_HEIGHT);
  	ctx = document.getElementById('canvasApp').getContext('2d');
- 	iterate(10000, 50, grid, updateCanvas);
+ 	iterate(COUNT, TIMEOUT, grid, updateCanvas);
  }
 
 document.addEventListener('DOMContentLoaded', function(){
